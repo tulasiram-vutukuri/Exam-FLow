@@ -87,14 +87,9 @@ if (window.location.pathname.includes('attend-exam.html')) {
 
 function startTimer(durationMinutes) {
     let timeLeft = durationMinutes * 60;
-    const timerEl = document.getElementById('timer');
 
     timerInterval = setInterval(() => {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-
-        timerEl.innerText = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
+        updateTimerDisplay(timeLeft);
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             alert('Time is up! Submitting your exam...');
@@ -104,55 +99,98 @@ function startTimer(durationMinutes) {
     }, 1000);
 }
 
+function updateTimerDisplay(timeLeft) {
+    const timerEl = document.getElementById('timer');
+    if (timerEl) {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerEl.innerText = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+}
+
 function showQuestion(index) {
     const examData = JSON.parse(localStorage.getItem('currentExam'));
+    if (!examData || !examData.questions) return;
+
     const questions = examData.questions;
     const qContainer = document.getElementById('questionContainer');
+
+    if (questions.length === 0) {
+        qContainer.innerHTML = `
+            <div style="text-align: center; padding: 5rem; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
+                <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">No Questions Available</h2>
+                <p style="color: var(--text-muted);">This examination currently has no questions. Please contact your instructor.</p>
+                <button onclick="window.location.href='student-dashboard.html'" class="btn btn-primary" style="margin-top: 2rem;">Back to Dashboard</button>
+            </div>
+        `;
+        return;
+    }
+
+    if (!questions[index]) return;
+
     const q = questions[index];
+    currentQuestionIndex = index;
 
     qContainer.innerHTML = `
-        <div class="card animate-slide-up" style="margin-top: 1.5rem; border-left: 6px solid var(--primary);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <span style="color: var(--text-muted); font-weight: 700; font-size: 0.9rem;">QUESTION ${index + 1} OF ${questions.length}</span>
-                <span class="badge badge-info" id="timer">Loading...</span>
+        <div class="exam-layout animate-slide-up" style="margin-top: 2rem;">
+            <!-- Left: Question Numbers -->
+            <div class="question-numbers">
+                <div style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+                    <span id="timer" class="badge badge-info" style="font-size: 0.8rem; padding: 0.5rem; display: block; text-align: center;">--:--</span>
+                </div>
+                ${questions.map((_, i) => `
+                    <div class="q-num-btn ${i === index ? 'active' : ''} ${userAnswers[questions[i].id] ? 'answered' : ''}" 
+                         onclick="navigateQuestion(${i})"
+                         style="${userAnswers[questions[i].id] && i !== index ? 'border-color: var(--accent); color: var(--accent);' : ''}">
+                        ${i + 1}
+                    </div>
+                `).join('')}
             </div>
-            <p style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); line-height: 1.4; margin-bottom: 2.5rem;">${q.question}</p>
-            
-            <div style="display: grid; gap: 1rem;">
+
+            <!-- Middle: Question Section -->
+            <div class="question-section">
+                <span style="color: var(--accent); font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; display: block;">
+                    Question ${index + 1} of ${questions.length}
+                </span>
+                <h2 style="font-size: 1.5rem; font-weight: 600; color: var(--text-main); line-height: 1.4;">
+                    ${q.question}
+                </h2>
+            </div>
+
+            <!-- Right: Options Section -->
+            <div class="options-section">
                 ${['A', 'B', 'C', 'D'].map(opt => {
         const optKey = `option_${opt.toLowerCase()}`;
         const isSelected = userAnswers[q.id] === opt;
         return `
-                        <label class="option-label" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border: 1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: ${isSelected ? 'var(--bg-main)' : '#fff'};">
-                            <input type="radio" name="q_${q.id}" value="${opt}" ${isSelected ? 'checked' : ''} style="accent-color: var(--primary); width: 1.2rem; height: 1.2rem;">
-                            <span style="font-weight: 600; font-size: 1rem;">${opt}. ${q[optKey]}</span>
+                        <label class="option-card ${isSelected ? 'selected' : ''}" onclick="selectOption('${q.id}', '${opt}')">
+                            <input type="radio" name="q_${q.id}" value="${opt}" ${isSelected ? 'checked' : ''} style="display: none;">
+                            <span style="font-weight: 500; font-size: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; background: ${isSelected ? 'var(--accent)' : 'transparent'}; color: ${isSelected ? 'white' : 'inherit'}; border-color: ${isSelected ? 'var(--accent)' : 'var(--border)'};">
+                                    ${opt}
+                                </span>
+                                ${q[optKey]}
+                            </span>
                         </label>
                     `;
     }).join('')}
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    ${index > 0 ? `<button type="button" onclick="navigateQuestion(${index - 1})" class="btn btn-secondary" style="flex: 1;">Previous</button>` : ''}
+                    ${index < questions.length - 1
+            ? `<button type="button" onclick="navigateQuestion(${index + 1})" class="btn btn-primary" style="flex: 1;">Next Question</button>`
+            : `<button type="button" onclick="submitExam()" class="btn btn-primary" style="flex: 1;">Finish Exam</button>`
+        }
+                </div>
             </div>
         </div>
-        <div style="display: flex; gap: 1.5rem; margin-top: 2.5rem;">
-            ${index > 0 ? `<button onclick="navigateQuestion(${index - 1})" class="btn btn-secondary" style="flex: 1; padding: 1rem;">Previous</button>` : ''}
-            ${index < questions.length - 1
-            ? `<button onclick="navigateQuestion(${index + 1})" class="btn btn-primary" style="flex: 1; padding: 1rem;">Save & Next <i class="fas fa-chevron-right"></i></button>`
-            : `<button onclick="submitExam()" class="btn btn-primary" style="flex: 1; padding: 1rem; background: var(--secondary-gradient);">Submit Examination <i class="fas fa-check-double"></i></button>`
-        }
-        </div>
     `;
+}
 
-    document.querySelectorAll('.option-label').forEach(label => {
-        label.onclick = function () {
-            this.querySelector('input').checked = true;
-            saveAnswer(q.id);
-            // Refresh visuals
-            document.querySelectorAll('.option-label').forEach(l => {
-                l.style.borderColor = 'var(--border)';
-                l.style.background = '#fff';
-            });
-            this.style.borderColor = 'var(--primary)';
-            this.style.background = 'var(--bg-main)';
-        };
-    });
+function selectOption(qId, val) {
+    userAnswers[qId] = val;
+    showQuestion(currentQuestionIndex);
 }
 
 function saveAnswer(qId) {
@@ -170,12 +208,24 @@ function navigateQuestion(newIndex) {
     showQuestion(currentQuestionIndex);
 }
 
+let isSubmitting = false;
+
 async function submitExam() {
+    if (isSubmitting) return;
+
     const examData = JSON.parse(localStorage.getItem('currentExam'));
     const qId = examData.questions[currentQuestionIndex].id;
     saveAnswer(qId);
 
     try {
+        isSubmitting = true;
+
+        // Update button UI to show it's processing
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => btn.disabled = true);
+        const submitBtn = Array.from(buttons).find(b => b.innerText.includes('Finish Exam'));
+        if (submitBtn) submitBtn.innerText = 'Submitting...';
+
         const response = await fetch('/api/student/submit-exam', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -191,10 +241,22 @@ async function submitExam() {
             localStorage.setItem('lastScore', data.score);
             localStorage.setItem('lastTotal', data.total);
             localStorage.setItem('lastResultId', data.result_id);
-            window.location.href = 'result.html';
+            window.location.replace('result.html');
+        } else {
+            alert('Server error: ' + (data.message || 'Unknown error'));
+            isSubmitting = false;
+            if (submitBtn) submitBtn.innerText = 'Finish Exam';
+            buttons.forEach(btn => btn.disabled = false);
         }
     } catch (error) {
-        alert('Error submitting exam');
+        console.error(error);
+        alert('Error submitting exam. Please check your connection.');
+        isSubmitting = false;
+
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => btn.disabled = false);
+        const submitBtn = Array.from(buttons).find(b => b.innerText.includes('Submitting...'));
+        if (submitBtn) submitBtn.innerText = 'Finish Exam';
     }
 }
 

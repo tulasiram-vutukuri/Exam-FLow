@@ -22,12 +22,12 @@
     <div class="container" style="max-width: 800px;">
         <div id="examFormSection">
             <header style="margin-bottom: 3rem; text-align: center;">
-                <h2 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.5rem;">
+                <h2 style="font-size: 2.25rem; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 0.5rem;">
                     Create New Examination</h2>
                 <p style="color: var(--text-muted); font-weight: 500;">Set up your exam structure and schedule.</p>
             </header>
 
-            <div class="card" style="padding: 3rem; border-radius: 24px;">
+            <div class="card" style="padding: 3rem;">
                 <form id="createExamForm">
                     <div class="form-group">
                         <label for="title">Exam Title</label>
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary"
-                        style="width: 100%; margin-top: 1rem; padding: 1rem; border-radius: 12px; font-size: 1rem;">
+                        style="width: 100%; margin-top: 1rem; padding: 1rem; font-size: 1rem;">
                         Proceed to Questions <i class="fas fa-chevron-right" style="margin-left: 0.5rem;"></i>
                     </button>
                 </form>
@@ -53,7 +53,7 @@
 
         <div id="questionSection" style="display: none;">
             <header style="margin-bottom: 3rem; text-align: center;">
-                <h2 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.5rem;"
+                <h2 style="font-size: 2.25rem; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 0.5rem;"
                     id="currentExamTitle">Add Questions</h2>
                 <p style="color: var(--text-muted); font-weight: 500;">Fill in the multiple-choice questions for your
                     exam.</p>
@@ -61,11 +61,11 @@
                     style="display: inline-flex; align-items: center; gap: 0.75rem; background: var(--bg-main); padding: 0.5rem 1.25rem; border-radius: 100px; margin-top: 1.5rem; border: 1px solid var(--border);">
                     <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">ENTRANCE CODE:</span>
                     <span id="generatedCode"
-                        style="font-family: monospace; font-size: 1.2rem; font-weight: 800; color: var(--primary); letter-spacing: 2px;"></span>
+                        style="font-family: monospace; font-size: 1.2rem; font-weight: 700; color: var(--primary); letter-spacing: 2px;"></span>
                 </div>
             </header>
 
-            <div class="card" style="padding: 3rem; border-radius: 24px; margin-bottom: 2rem;">
+            <div class="card" style="padding: 3rem; margin-bottom: 2rem;">
                 <form id="addQuestionForm">
                     <input type="hidden" id="currentExamId">
                     <div class="form-group">
@@ -108,8 +108,8 @@
                             <i class="fas fa-plus"></i> Add Next Question
                         </button>
                         <button type="button" onclick="publishExam()" class="btn btn-primary"
-                            style="flex: 1.5; padding: 1rem; border-radius: 12px; background: var(--secondary-gradient);">
-                            Finish & Publish Exam <i class="fas fa-check-circle" style="margin-left: 0.5rem;"></i>
+                            style="flex: 1.5; padding: 1rem; font-size: 1rem;">
+                            Save and Publish Exam <i class="fas fa-check-circle" style="margin-left: 0.5rem;"></i>
                         </button>
                     </div>
                 </form>
