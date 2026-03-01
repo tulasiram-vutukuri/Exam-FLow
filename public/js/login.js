@@ -6,9 +6,9 @@ if (loginForm) {
 
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        const errorMsg = document.getElementById('error');
+        const errorMsg = document.getElementById('errorMsg');
 
-        errorMsg.style.display = 'none';
+        if (errorMsg) errorMsg.style.display = 'none';
 
         try {
             const response = await fetch('/api/auth/login', {
@@ -30,12 +30,16 @@ if (loginForm) {
                     window.location.href = '/pages/student-dashboard.html';
                 }
             } else {
-                errorMsg.innerText = data.message || 'Invalid credentials';
-                errorMsg.style.display = 'block';
+                if (errorMsg) {
+                    errorMsg.innerText = data.message || 'Invalid credentials';
+                    errorMsg.style.display = 'block';
+                }
             }
         } catch (error) {
-            errorMsg.innerText = 'Unable to connect to server. Please try again.';
-            errorMsg.style.display = 'block';
+            if (errorMsg) {
+                errorMsg.innerText = 'Unable to connect to server. Please try again.';
+                errorMsg.style.display = 'block';
+            }
             console.error(error);
         }
     });

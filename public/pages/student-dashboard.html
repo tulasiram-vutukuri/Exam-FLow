@@ -4,61 +4,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard - Online Exam System</title>
+    <title>Student Dashboard | ExamPortal</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="animate-fade-in">
+<body class="animate-slide-up">
     <nav class="nav">
-        <h1>ExamPortal</h1>
+        <h1>ExamPortal <span style="font-weight: 300; font-size: 0.9rem; color: var(--text-muted);">Student</span></h1>
         <div style="display: flex; align-items: center; gap: 1.5rem;">
-            <div style="text-align: right;">
-                <p id="studentName" style="font-weight: 600; color: var(--text-main); line-height: 1;">Student</p>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Active Student</p>
+            <div style="text-align: right; border-right: 1px solid var(--border); padding-right: 1.5rem;">
+                <p id="studentName" style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">Student</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">Candidate</p>
             </div>
-            <button class="btn btn-secondary" onclick="logout()" style="padding: 0.5rem 1rem;">Logout</button>
+            <button class="btn btn-secondary" onclick="logout()" style="padding: 0.5rem 1rem;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </nav>
 
     <div class="container">
-        <div class="card"
-            style="margin-bottom: 3rem; background: linear-gradient(to right, #ffffff, #f1f5f9); border-left: 4px solid var(--primary);">
-            <h2 style="margin-bottom: 0.5rem;">Ready to take an exam?</h2>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Enter the unique 6-digit code provided by your
-                proctor to begin.</p>
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+            <div>
+                <h2
+                    style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem; background: var(--secondary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    Welcome, <span id="welcomeName">Student</span>
+                </h2>
+                <p style="color: var(--text-muted); font-weight: 500;">Ready to excel in your examinations?</p>
+            </div>
+            <button onclick="document.getElementById('startExamSection').scrollIntoView({behavior: 'smooth'})"
+                class="btn btn-primary" style="padding: 0.875rem 1.75rem; border-radius: 12px;">
+                <i class="fas fa-play"></i> Take an Exam
+            </button>
+        </header>
 
-            <form id="startExamForm" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 250px;">
-                    <input type="text" id="examCode" placeholder="Enter 6-digit exam code" required
-                        style="width: 100%; padding: 0.9rem 1.2rem; border-radius: 8px; border: 1.5px solid var(--border); font-size: 1rem; font-weight: 600; letter-spacing: 2px;">
+        <!-- Student Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(14, 165, 233, 0.1); color: var(--secondary);">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-                <button type="submit" class="btn btn-primary" style="padding: 0.9rem 2rem;">Start Exam Now</button>
-            </form>
-            <p id="examError" style="color: #ef4444; margin-top: 1rem; font-size: 0.9rem; display: none;"></p>
+                <div>
+                    <p
+                        style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                        Exams Taken</p>
+                    <h4 id="statExamsTaken" style="font-size: 1.5rem; font-weight: 800;">0</h4>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <p
+                        style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                        Average Score</p>
+                    <h4 id="statAvgScore" style="font-size: 1.5rem; font-weight: 800;">0%</h4>
+                </div>
+            </div>
         </div>
 
-        <section style="margin-bottom: 3rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem;">Scheduled Exams</h2>
-                <span
-                    style="font-size: 0.85rem; color: var(--text-muted); background: var(--bg-main); padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid var(--border);">Upcoming</span>
-            </div>
-            <div id="availableExams" class="dashboard-grid">
-                <!-- Available exams will be loaded here -->
-            </div>
-        </section>
-
-        <section>
-            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Performance Overview</h2>
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <div style="overflow-x: auto;">
+        <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start;">
+            <!-- Main Content: Past Results -->
+            <section>
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Your Performance History</h3>
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>Exam Title</th>
                                 <th>Score</th>
-                                <th>Total Questions</th>
-                                <th>Completion Date</th>
+                                <th>Date</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="pastResultsBody">
@@ -66,6 +83,36 @@
                         </tbody>
                     </table>
                 </div>
+            </section>
+
+            <!-- Sidebar: Start Exam -->
+            <aside id="startExamSection">
+                <div class="card" style="position: sticky; top: 100px;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">Enter Exam Code</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                        Enter the 6-digit code provided by your instructor to begin.
+                    </p>
+                    <form id="startExamForm">
+                        <div class="form-group">
+                            <input type="text" id="examCode" placeholder="e.g. AB12CD" maxlength="6"
+                                style="text-align: center; font-size: 1.25rem; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;">
+                        </div>
+                        <p id="examError"
+                            style="color: var(--accent); font-size: 0.8rem; margin-bottom: 1rem; display: none; font-weight: 600;">
+                        </p>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            Begin Examination <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Available Exams Section (Dynamic) -->
+        <section style="margin-top: 4rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Upcoming & Ongoing Exams</h3>
+            <div id="availableExams" class="dashboard-grid">
+                <!-- Available exams will be loaded here -->
             </div>
         </section>
     </div>
@@ -76,7 +123,9 @@
             localStorage.clear();
             window.location.href = 'login.html';
         }
-        document.getElementById('studentName').innerText = localStorage.getItem('username') || 'Student';
+        const username = localStorage.getItem('username') || 'Student';
+        document.getElementById('studentName').innerText = username;
+        document.getElementById('welcomeName').innerText = username.split('@')[0];
     </script>
 </body>
 

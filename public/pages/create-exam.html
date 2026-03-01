@@ -4,75 +4,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Exam - Online Exam System</title>
+    <title>Create Exam | ExamPortal</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
+<body class="animate-slide-up">
     <nav class="nav">
-        <h1>Create New Exam</h1>
-        <a href="admin-dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+        <h1>ExamPortal <span style="font-weight: 300; font-size: 0.9rem; color: var(--text-muted);">Creator</span></h1>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <a href="admin-dashboard.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
     </nav>
 
-    <div class="container" style="max-width: 600px;">
-        <div class="card" id="examFormSection">
-            <h2>Exam Details</h2>
-            <form id="createExamForm">
-                <div class="form-group">
-                    <label for="title">Exam Title</label>
-                    <input type="text" id="title" required placeholder="e.g. JavaScript Basics">
-                </div>
-                <div class="form-group">
-                    <label for="scheduledAt">Scheduled Time</label>
-                    <input type="datetime-local" id="scheduledAt" required>
-                </div>
-                <div class="form-group">
-                    <label for="duration">Duration (minutes)</label>
-                    <input type="number" id="duration" required min="1" value="30">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Exam</button>
-            </form>
+    <div class="container" style="max-width: 800px;">
+        <div id="examFormSection">
+            <header style="margin-bottom: 3rem; text-align: center;">
+                <h2 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.5rem;">
+                    Create New Examination</h2>
+                <p style="color: var(--text-muted); font-weight: 500;">Set up your exam structure and schedule.</p>
+            </header>
+
+            <div class="card" style="padding: 3rem; border-radius: 24px;">
+                <form id="createExamForm">
+                    <div class="form-group">
+                        <label for="title">Exam Title</label>
+                        <input type="text" id="title" placeholder="e.g. Mid-Term Mathematics 2024" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label for="scheduledAt">Start Date & Time</label>
+                            <input type="datetime-local" id="scheduledAt" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Duration (Minutes)</label>
+                            <input type="number" id="duration" placeholder="e.g. 60" required min="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; margin-top: 1rem; padding: 1rem; border-radius: 12px; font-size: 1rem;">
+                        Proceed to Questions <i class="fas fa-chevron-right" style="margin-left: 0.5rem;"></i>
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <div class="card" id="questionSection" style="display: none; margin-top: 2rem;">
-            <h2>Add MCQ Questions</h2>
-            <p>Exam Code: <strong id="generatedCode"></strong></p>
-            <form id="addQuestionForm">
-                <input type="hidden" id="currentExamId">
-                <div class="form-group">
-                    <label for="questionText">Question Text</label>
-                    <textarea id="questionText" required rows="3"></textarea>
+        <div id="questionSection" style="display: none;">
+            <header style="margin-bottom: 3rem; text-align: center;">
+                <h2 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.5rem;"
+                    id="currentExamTitle">Add Questions</h2>
+                <p style="color: var(--text-muted); font-weight: 500;">Fill in the multiple-choice questions for your
+                    exam.</p>
+                <div
+                    style="display: inline-flex; align-items: center; gap: 0.75rem; background: var(--bg-main); padding: 0.5rem 1.25rem; border-radius: 100px; margin-top: 1.5rem; border: 1px solid var(--border);">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">ENTRANCE CODE:</span>
+                    <span id="generatedCode"
+                        style="font-family: monospace; font-size: 1.2rem; font-weight: 800; color: var(--primary); letter-spacing: 2px;"></span>
                 </div>
-                <div class="form-group">
-                    <label for="optionA">Option A</label>
-                    <input type="text" id="optionA" required>
-                </div>
-                <div class="form-group">
-                    <label for="optionB">Option B</label>
-                    <input type="text" id="optionB" required>
-                </div>
-                <div class="form-group">
-                    <label for="optionC">Option C</label>
-                    <input type="text" id="optionC" required>
-                </div>
-                <div class="form-group">
-                    <label for="optionD">Option D</label>
-                    <input type="text" id="optionD" required>
-                </div>
-                <div class="form-group">
-                    <label for="correctOption">Correct Answer</label>
-                    <select id="correctOption" required>
-                        <option value="A">Option A</option>
-                        <option value="B">Option B</option>
-                        <option value="C">Option C</option>
-                        <option value="D">Option D</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Save & Next Question</button>
-            </form>
-            <hr style="margin: 2rem 0;">
-            <button onclick="publishExam()" class="btn btn-secondary"
-                style="width: 100%; background: #10b981; color: white;">Finish and Publish Exam</button>
+            </header>
+
+            <div class="card" style="padding: 3rem; border-radius: 24px; margin-bottom: 2rem;">
+                <form id="addQuestionForm">
+                    <input type="hidden" id="currentExamId">
+                    <div class="form-group">
+                        <label for="questionText">Question Content</label>
+                        <textarea id="questionText" placeholder="Was the question?" rows="3" required></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <label>Option A</label>
+                            <input type="text" id="optionA" placeholder="Answer A" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Option B</label>
+                            <input type="text" id="optionB" placeholder="Answer B" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Option C</label>
+                            <input type="text" id="optionC" placeholder="Answer C" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Option D</label>
+                            <input type="text" id="optionD" placeholder="Answer D" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group"
+                        style="max-width: 300px; margin-left: auto; margin-right: auto; text-align: center;">
+                        <label for="correctOption">Mark Correct Answer</label>
+                        <select id="correctOption" required style="text-align: center; font-weight: 700;">
+                            <option value="A">OPTION A</option>
+                            <option value="B">OPTION B</option>
+                            <option value="C">OPTION C</option>
+                            <option value="D">OPTION D</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-secondary" style="flex: 1; padding: 1rem;">
+                            <i class="fas fa-plus"></i> Add Next Question
+                        </button>
+                        <button type="button" onclick="publishExam()" class="btn btn-primary"
+                            style="flex: 1.5; padding: 1rem; border-radius: 12px; background: var(--secondary-gradient);">
+                            Finish & Publish Exam <i class="fas fa-check-circle" style="margin-left: 0.5rem;"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 

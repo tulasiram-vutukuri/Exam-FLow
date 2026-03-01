@@ -6,18 +6,38 @@ async function loadAvailableExams() {
         const response = await fetch('/api/student/available-exams');
         const exams = await response.json();
 
-        availableExams.innerHTML = exams.map(exam => `
-            <div class="exam-card">
-                <h3>${exam.title}</h3>
-                <p style="font-size: 0.85rem; color: #6b7280; margin: 0.5rem 0;">
-                    <i class="far fa-calendar-alt"></i> ${new Date(exam.scheduled_at).toLocaleString()}<br>
-                    <i class="far fa-clock"></i> ${exam.duration} Minutes
-                </p>
-                <div style="margin-top: 1rem; padding: 0.5rem; background: #fef3c7; color: #92400e; border-radius: 0.25rem; font-size: 0.85rem; text-align: center; font-weight: 500;">
-                    ${new Date() < new Date(exam.scheduled_at) ? 'Coming Soon' : 'Available Now - Enter Code'}
+        if (exams.length === 0) {
+            availableExams.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: #fff; border-radius: 16px; border: 1px dashed var(--border);">
+                    <p style="color: var(--text-muted); font-weight: 500;">No exams available at the moment.</p>
                 </div>
-            </div>
-        `).join('');
+            `;
+            return;
+        }
+
+        availableExams.innerHTML = exams.map(exam => {
+            const now = new Date();
+            const start = new Date(exam.scheduled_at);
+            const isSoon = now < start;
+
+            return `
+                <div class="exam-card animate-slide-up">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <h3 style="font-weight: 700; font-size: 1.1rem;">${exam.title}</h3>
+                        <span class="badge ${isSoon ? 'badge-warning' : 'badge-success'}">
+                            ${isSoon ? 'UPCOMING' : 'AVAILABLE'}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                        <p style="margin-bottom: 0.5rem;"><i class="far fa-calendar-alt" style="color: var(--secondary); margin-right: 0.5rem;"></i> ${start.toLocaleString()}</p>
+                        <p><i class="far fa-clock" style="color: var(--accent); margin-right: 0.5rem;"></i> ${exam.duration} Minutes</p>
+                    </div>
+                    <button onclick="document.getElementById('examCode').value = '${exam.exam_code}'; document.getElementById('examCode').focus();" class="btn btn-secondary" style="width: 100%; font-size: 0.8rem; border-color: var(--primary); color: var(--primary);">
+                        Enter Exam
+                    </button>
+                </div>
+            `;
+        }).join('');
     } catch (error) {
         console.error('Error loading exams:', error);
     }
@@ -28,7 +48,7 @@ const startExamForm = document.getElementById('startExamForm');
 if (startExamForm) {
     startExamForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const code = document.getElementById('examCode').value;
+        const code = document.getElementById('examCode').value.toUpperCase();
         const errorEl = document.getElementById('examError');
 
         try {
@@ -90,42 +110,47 @@ function showQuestion(index) {
     const qContainer = document.getElementById('questionContainer');
     const q = questions[index];
 
-    // Save previous question answer before moving if possible
-    // (This is handled by the "Next" button too, but for safety)
-
     qContainer.innerHTML = `
-        <div class="card" style="margin-top: 1.5rem;">
-            <p style="color: #6b7280; margin-bottom: 0.5rem;">Question ${index + 1} of ${questions.length}</p>
-            <p style="font-size: 1.2rem; font-weight: 500;"><strong>Q${index + 1}.</strong> ${q.question}</p>
-            <div style="margin-top: 1.5rem;">
-                <label style="display: block; margin: 0.8rem 0; padding: 0.8rem; border: 1px solid #e5e7eb; border-radius: 0.4rem; cursor: pointer;">
-                    <input type="radio" name="q_${q.id}" value="A" ${userAnswers[q.id] === 'A' ? 'checked' : ''}> A. ${q.option_a}
-                </label>
-                <label style="display: block; margin: 0.8rem 0; padding: 0.8rem; border: 1px solid #e5e7eb; border-radius: 0.4rem; cursor: pointer;">
-                    <input type="radio" name="q_${q.id}" value="B" ${userAnswers[q.id] === 'B' ? 'checked' : ''}> B. ${q.option_b}
-                </label>
-                <label style="display: block; margin: 0.8rem 0; padding: 0.8rem; border: 1px solid #e5e7eb; border-radius: 0.4rem; cursor: pointer;">
-                    <input type="radio" name="q_${q.id}" value="C" ${userAnswers[q.id] === 'C' ? 'checked' : ''}> C. ${q.option_c}
-                </label>
-                <label style="display: block; margin: 0.8rem 0; padding: 0.8rem; border: 1px solid #e5e7eb; border-radius: 0.4rem; cursor: pointer;">
-                    <input type="radio" name="q_${q.id}" value="D" ${userAnswers[q.id] === 'D' ? 'checked' : ''}> D. ${q.option_d}
-                </label>
+        <div class="card animate-slide-up" style="margin-top: 1.5rem; border-left: 6px solid var(--primary);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <span style="color: var(--text-muted); font-weight: 700; font-size: 0.9rem;">QUESTION ${index + 1} OF ${questions.length}</span>
+                <span class="badge badge-info" id="timer">Loading...</span>
+            </div>
+            <p style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); line-height: 1.4; margin-bottom: 2.5rem;">${q.question}</p>
+            
+            <div style="display: grid; gap: 1rem;">
+                ${['A', 'B', 'C', 'D'].map(opt => {
+        const optKey = `option_${opt.toLowerCase()}`;
+        const isSelected = userAnswers[q.id] === opt;
+        return `
+                        <label class="option-label" style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; border: 1px solid ${isSelected ? 'var(--primary)' : 'var(--border)'}; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: ${isSelected ? 'var(--bg-main)' : '#fff'};">
+                            <input type="radio" name="q_${q.id}" value="${opt}" ${isSelected ? 'checked' : ''} style="accent-color: var(--primary); width: 1.2rem; height: 1.2rem;">
+                            <span style="font-weight: 600; font-size: 1rem;">${opt}. ${q[optKey]}</span>
+                        </label>
+                    `;
+    }).join('')}
             </div>
         </div>
-        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-            ${index > 0 ? `<button onclick="navigateQuestion(${index - 1})" class="btn" style="flex: 1; border: 1px solid var(--primary-color); color: var(--primary-color);">Previous</button>` : ''}
+        <div style="display: flex; gap: 1.5rem; margin-top: 2.5rem;">
+            ${index > 0 ? `<button onclick="navigateQuestion(${index - 1})" class="btn btn-secondary" style="flex: 1; padding: 1rem;">Previous</button>` : ''}
             ${index < questions.length - 1
-            ? `<button onclick="navigateQuestion(${index + 1})" class="btn btn-primary" style="flex: 1;">Next</button>`
-            : `<button onclick="submitExam()" class="btn btn-secondary" style="flex: 1; background: #10b981; color: white;">Submit Exam</button>`
+            ? `<button onclick="navigateQuestion(${index + 1})" class="btn btn-primary" style="flex: 1; padding: 1rem;">Save & Next <i class="fas fa-chevron-right"></i></button>`
+            : `<button onclick="submitExam()" class="btn btn-primary" style="flex: 1; padding: 1rem; background: var(--secondary-gradient);">Submit Examination <i class="fas fa-check-double"></i></button>`
         }
         </div>
     `;
 
-    // Make whole labels clickable for radio selection
-    document.querySelectorAll('#questionContainer label').forEach(label => {
+    document.querySelectorAll('.option-label').forEach(label => {
         label.onclick = function () {
             this.querySelector('input').checked = true;
             saveAnswer(q.id);
+            // Refresh visuals
+            document.querySelectorAll('.option-label').forEach(l => {
+                l.style.borderColor = 'var(--border)';
+                l.style.background = '#fff';
+            });
+            this.style.borderColor = 'var(--primary)';
+            this.style.background = 'var(--bg-main)';
         };
     });
 }
@@ -141,7 +166,6 @@ function navigateQuestion(newIndex) {
     const examData = JSON.parse(localStorage.getItem('currentExam'));
     const qId = examData.questions[currentQuestionIndex].id;
     saveAnswer(qId);
-
     currentQuestionIndex = newIndex;
     showQuestion(currentQuestionIndex);
 }
@@ -149,7 +173,7 @@ function navigateQuestion(newIndex) {
 async function submitExam() {
     const examData = JSON.parse(localStorage.getItem('currentExam'));
     const qId = examData.questions[currentQuestionIndex].id;
-    saveAnswer(qId); // Save the last question's answer
+    saveAnswer(qId);
 
     try {
         const response = await fetch('/api/student/submit-exam', {
@@ -166,17 +190,12 @@ async function submitExam() {
         if (response.ok) {
             localStorage.setItem('lastScore', data.score);
             localStorage.setItem('lastTotal', data.total);
+            localStorage.setItem('lastResultId', data.result_id);
             window.location.href = 'result.html';
         }
     } catch (error) {
         alert('Error submitting exam');
     }
-}
-
-// Initialize
-if (document.getElementById('availableExams')) {
-    loadAvailableExams();
-    loadPastResults();
 }
 
 async function loadPastResults() {
@@ -188,20 +207,44 @@ async function loadPastResults() {
         const response = await fetch(`/api/student/past-results/${username}`);
         const results = await response.json();
 
+        // Update Stats
+        if (document.getElementById('statExamsTaken')) {
+            document.getElementById('statExamsTaken').innerText = results.length;
+            const avg = results.length > 0
+                ? (results.reduce((acc, r) => acc + (r.score / r.total), 0) / results.length * 100).toFixed(1)
+                : 0;
+            document.getElementById('statAvgScore').innerText = `${avg}%`;
+        }
+
         if (results.length === 0) {
-            pastResultsBody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center;">You haven\'t attended any exams yet.</td></tr>';
+            pastResultsBody.innerHTML = '<tr><td colspan="4" style="padding: 3rem; text-align: center; color: var(--text-muted);">No results found. Start your first exam!</td></tr>';
             return;
         }
 
         pastResultsBody.innerHTML = results.map(res => `
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 1rem;">${res.title}</td>
-                <td style="padding: 1rem;">${res.score}</td>
-                <td style="padding: 1rem;">${res.total}</td>
-                <td style="padding: 1rem;">${new Date(res.submitted_at).toLocaleDateString()}</td>
+            <tr>
+                <td style="font-weight: 700;">${res.title}</td>
+                <td>
+                    <span style="font-weight: 800; color: var(--primary);">${res.score}</span> / ${res.total}
+                </td>
+                <td style="color: var(--text-muted); font-size: 0.85rem;">${new Date(res.submitted_at).toLocaleDateString()}</td>
+                <td>
+                    <a href="result-details.html?id=${res.id}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">
+                        <i class="fas fa-search"></i> Details
+                    </a>
+                </td>
             </tr>
         `).join('');
     } catch (error) {
         console.error('Error loading past results:', error);
     }
+}
+
+// Initialize
+if (document.getElementById('availableExams')) {
+    loadAvailableExams();
+    loadPastResults();
+}
+if (document.getElementById('pastResultsBody') && !document.getElementById('availableExams')) {
+    loadPastResults();
 }

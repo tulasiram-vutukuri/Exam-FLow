@@ -54,15 +54,52 @@ router.post('/submit-exam', async (req, res) => {
             }
         });
 
-        await db.execute(
+        const [result] = await db.execute(
             'INSERT INTO results (student_username, exam_id, score, total) VALUES (?, ?, ?, ?)',
             [student_username, exam_id, score, total]
         );
 
-        res.json({ score, total });
+        const result_id = result.insertId;
+
+        // Save detailed answers
+        for (const q of questions) {
+            const selected = answers[q.id] || null;
+            const is_correct = selected === q.correct_option;
+            await db.execute(
+                'INSERT INTO student_answers (result_id, question_id, selected_option, is_correct) VALUES (?, ?, ?, ?)',
+                [result_id, q.id, selected, is_correct]
+            );
+        }
+
+        res.json({ score, total, result_id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error submitting exam' });
+    }
+});
+
+// Get detailed result
+router.get('/result-details/:result_id', async (req, res) => {
+    const { result_id } = req.params;
+    try {
+        const [details] = await db.execute(`
+            SELECT sa.*, q.question, q.option_a, q.option_b, q.option_c, q.option_d, q.correct_option 
+            FROM student_answers sa 
+            JOIN questions q ON sa.question_id = q.id 
+            WHERE sa.result_id = ?
+        `, [result_id]);
+
+        const [resultInfo] = await db.execute(`
+            SELECT r.*, e.title, e.duration 
+            FROM results r 
+            JOIN exams e ON r.exam_id = e.id 
+            WHERE r.id = ?
+        `, [result_id]);
+
+        res.json({ info: resultInfo[0], details });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching result details' });
     }
 });
 

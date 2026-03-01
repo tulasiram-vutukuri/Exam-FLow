@@ -40,6 +40,16 @@ CREATE TABLE IF NOT EXISTS results (
     FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS student_answers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    result_id INT NOT NULL,
+    question_id INT NOT NULL,
+    selected_option ENUM('A', 'B', 'C', 'D'),
+    is_correct BOOLEAN,
+    FOREIGN KEY (result_id) REFERENCES results(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+);
+
 -- Insert default admin
 -- Password: admin@22
 INSERT IGNORE INTO users (username, password, role) VALUES ('Admin@09', '$2y$10$VPuDb7RUPf8jLwYEXKVxIuVoxiXZi9q1bwWSM2FaNaFGfKSdNzNpy', 'admin');

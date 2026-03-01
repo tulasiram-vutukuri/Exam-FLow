@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Performance Details | ExamPortal</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="animate-slide-up">
+    <nav class="nav">
+        <h1>ExamPortal <span style="font-weight: 300; font-size: 0.9rem; color: var(--text-muted);">Results</span></h1>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <a href="student-dashboard.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 800px;">
+        <header style="margin-bottom: 3rem; text-align: center;">
+            <h2 id="examTitle" style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Loading Results...</h2>
+            <p id="submissionDate" style="color: var(--text-muted); font-weight: 500;"></p>
+        </header>
+
+        <!-- Score OverviewCard -->
+        <div class="card"
+            style="margin-bottom: 2.5rem; text-align: center; background: var(--bg-main); border: 2px solid var(--primary);">
+            <div
+                style="display: flex; justify-content: center; align-items: baseline; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <h3 id="displayScore" style="font-size: 4rem; font-weight: 800; color: var(--primary);">0</h3>
+                <span style="font-size: 1.5rem; color: var(--text-muted); font-weight: 600;">/</span>
+                <span id="displayTotal" style="font-size: 1.5rem; color: var(--text-muted); font-weight: 600;">0</span>
+            </div>
+            <p style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);" id="performanceLabel">Analyzing
+                Performance...</p>
+            <div
+                style="margin-top: 1.5rem; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; width: 60%; margin-left: auto; margin-right: auto;">
+                <div id="scoreProgressBar"
+                    style="height: 100%; background: var(--primary-gradient); width: 0%; transition: width 1s ease-out;">
+                </div>
+            </div>
+        </div>
+
+        <section id="detailsContainer">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Detailed Question Breakdown</h3>
+            <div id="questionBreakdown">
+                <!-- Detailed questions will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const resultId = urlParams.get('id');
+
+        async function loadResultDetails() {
+            if (!resultId) {
+                window.location.href = 'student-dashboard.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/student/result-details/${resultId}`);
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.message);
+
+                const { info, details } = data;
+
+                // Update Header
+                document.getElementById('examTitle').innerText = info.title;
+                document.getElementById('submissionDate').innerText = `Submitted on ${new Date(info.submitted_at).toLocaleString()}`;
+
+                // Update Score
+                document.getElementById('displayScore').innerText = info.score;
+                document.getElementById('displayTotal').innerText = info.total;
+
+                const percentage = (info.score / info.total) * 100;
+                document.getElementById('scoreProgressBar').style.width = `${percentage}%`;
+
+                let label = "Keep Practicing!";
+                if (percentage >= 90) label = "Outstanding Performance! 🏆";
+                else if (percentage >= 75) label = "Great Job! 👏";
+                else if (percentage >= 50) label = "Good Effort! 👍";
+                document.getElementById('performanceLabel').innerText = label;
+
+                // Render Breakdown
+                const container = document.getElementById('questionBreakdown');
+                container.innerHTML = details.map((q, idx) => {
+                    const isCorrect = q.is_correct;
+                    const statusClass = isCorrect ? 'badge-success' : 'badge-danger';
+                    const statusIcon = isCorrect ? 'fa-check-circle' : 'fa-times-circle';
+
+                    return `
+                        <div class="card" style="margin-bottom: 1.5rem; position: relative; border-left: 6px solid ${isCorrect ? '#10b981' : '#f43f5e'};">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                <span style="font-weight: 700; color: var(--text-muted);">Question ${idx + 1}</span>
+                                <span class="badge ${statusClass}">
+                                    <i class="fas ${statusIcon}"></i> ${isCorrect ? 'Correct' : 'Incorrect'}
+                                </span>
+                            </div>
+                            <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem;">${q.question}</p>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div style="padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; ${q.selected_option === 'A' ? (isCorrect ? 'background: #dcfce7; border-color: #10b981;' : 'background: #fee2e2; border-color: #f43f5e;') : ''} ${q.correct_option === 'A' && !isCorrect ? 'border-color: #10b981; border-width: 2px;' : ''}">
+                                    <strong>A.</strong> ${q.option_a} ${q.correct_option === 'A' ? '✅' : ''}
+                                </div>
+                                <div style="padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; ${q.selected_option === 'B' ? (isCorrect ? 'background: #dcfce7; border-color: #10b981;' : 'background: #fee2e2; border-color: #f43f5e;') : ''} ${q.correct_option === 'B' && !isCorrect ? 'border-color: #10b981; border-width: 2px;' : ''}">
+                                    <strong>B.</strong> ${q.option_b} ${q.correct_option === 'B' ? '✅' : ''}
+                                </div>
+                                <div style="padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; ${q.selected_option === 'C' ? (isCorrect ? 'background: #dcfce7; border-color: #10b981;' : 'background: #fee2e2; border-color: #f43f5e;') : ''} ${q.correct_option === 'C' && !isCorrect ? 'border-color: #10b981; border-width: 2px;' : ''}">
+                                    <strong>C.</strong> ${q.option_c} ${q.correct_option === 'C' ? '✅' : ''}
+                                </div>
+                                <div style="padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; ${q.selected_option === 'D' ? (isCorrect ? 'background: #dcfce7; border-color: #10b981;' : 'background: #fee2e2; border-color: #f43f5e;') : ''} ${q.correct_option === 'D' && !isCorrect ? 'border-color: #10b981; border-width: 2px;' : ''}">
+                                    <strong>D.</strong> ${q.option_d} ${q.correct_option === 'D' ? '✅' : ''}
+                                </div>
+                            </div>
+                            
+                            ${!isCorrect ? `
+                                <div style="margin-top: 1.5rem; padding: 0.75rem; background: #fff7ed; border-radius: 8px; font-size: 0.9rem; color: #9a3412;">
+                                    <i class="fas fa-info-circle"></i> Correct Answer: <strong>Option ${q.correct_option}</strong>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Could not load detailed results.');
+            }
+        }
+
+        loadResultDetails();
+    </script>
+</body>
+
+</html>

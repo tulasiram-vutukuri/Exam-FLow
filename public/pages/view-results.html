@@ -4,29 +4,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Results - Online Exam System</title>
+    <title>Student Results | ExamPortal</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
+<body class="animate-slide-up">
     <nav class="nav">
-        <h1>Student Results</h1>
-        <a href="admin-dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+        <h1>ExamPortal <span style="font-weight: 300; font-size: 0.9rem; color: var(--text-muted);">Analytics</span>
+        </h1>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <a href="admin-dashboard.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
     </nav>
 
     <div class="container">
-        <div class="card">
-            <table style="width: 100%; border-collapse: collapse;">
+        <header style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem;">
+            <div>
+                <h2 id="examTitle"
+                    style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem; background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                    Examination Results
+                </h2>
+                <p style="color: var(--text-muted); font-weight: 500;">Comprehensive performance analysis for all
+                    candidates.</p>
+            </div>
+            <button id="downloadBtn" class="btn btn-primary"
+                style="padding: 0.875rem 1.75rem; border-radius: 12px; background: var(--secondary-gradient);">
+                <i class="fas fa-file-csv"></i> Export to CSV
+            </button>
+        </header>
+
+        <div class="table-container animate-slide-up">
+            <table>
                 <thead>
-                    <tr style="border-bottom: 2px solid #eee; text-align: left;">
-                        <th style="padding: 1rem;">Student Username</th>
-                        <th style="padding: 1rem;">Score</th>
-                        <th style="padding: 1rem;">Total</th>
-                        <th style="padding: 1rem;">Percentage</th>
+                    <tr>
+                        <th>Candidate ID</th>
+                        <th>Score Obtained</th>
+                        <th>Total Possible</th>
+                        <th>Percentage</th>
+                        <th>Submission Date</th>
                     </tr>
                 </thead>
                 <tbody id="resultsTableBody">
                     <!-- Results will be loaded here -->
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 4rem;">
+                            <i class="fas fa-spinner fa-spin"
+                                style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                            <p style="color: var(--text-muted); font-weight: 500;">Aggregating results data...</p>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -37,27 +66,50 @@
         const examId = urlParams.get('examId');
 
         async function loadResults() {
+            if (!examId) {
+                window.location.href = 'admin-dashboard.html';
+                return;
+            }
+
             try {
                 const response = await fetch(`/api/admin/results/${examId}`);
                 const results = await response.json();
 
                 const tableBody = document.getElementById('resultsTableBody');
-                tableBody.innerHTML = results.map(res => `
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 1rem;">${res.student_username}</td>
-                        <td style="padding: 1rem;">${res.score}</td>
-                        <td style="padding: 1rem;">${res.total}</td>
-                        <td style="padding: 1rem;">${((res.score / res.total) * 100).toFixed(2)}%</td>
-                    </tr>
-                `).join('');
 
                 if (results.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="padding: 2rem; text-align: center;">No students have attended this exam yet.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="5" style="padding: 5rem; text-align: center; color: var(--text-muted); font-weight: 500;">No candidates have submitted this examination yet.</td></tr>';
+                    return;
                 }
+
+                tableBody.innerHTML = results.map(res => {
+                    const percentage = ((res.score / res.total) * 100).toFixed(1);
+                    const perfClass = percentage >= 75 ? 'badge-success' : (percentage >= 40 ? 'badge-info' : 'badge-danger');
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 700; color: var(--text-main);">${res.student_username}</td>
+                            <td style="font-weight: 600;">${res.score}</td>
+                            <td style="color: var(--text-muted);">${res.total}</td>
+                            <td>
+                                <span class="badge ${perfClass}">${percentage}%</span>
+                            </td>
+                            <td style="color: var(--text-muted); font-size: 0.85rem;">
+                                ${new Date(res.submitted_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
             } catch (error) {
                 console.error('Error loading results:', error);
+                alert('Connection error. Failed to retrieve statistics.');
             }
         }
+
+        document.getElementById('downloadBtn').onclick = () => {
+            window.location.href = `/api/admin/results/${examId}/export`;
+        };
 
         if (examId) loadResults();
     </script>
