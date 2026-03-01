@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Online Exam System</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="animate-fade-in">
+    <nav class="nav">
+        <h1>ExamPortal <span
+                style="font-weight: 300; font-size: 0.9rem; color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); background: none;">Admin</span>
+        </h1>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div style="text-align: right;">
+                <p id="adminName" style="font-weight: 600; color: var(--text-main); line-height: 1;">Admin</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">System Administrator</p>
+            </div>
+            <button class="btn btn-secondary" onclick="logout()" style="padding: 0.5rem 1rem;">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+            <div>
+                <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Exam Management</h2>
+                <p style="color: var(--text-muted);">Create, manage, and monitor your examinations.</p>
+            </div>
+            <a href="create-exam.html" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create New Exam
+            </a>
+        </header>
+
+        <section>
+            <div id="examList" class="dashboard-grid">
+                <!-- Exams will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+        document.getElementById('adminName').innerText = localStorage.getItem('username') || 'Admin';
+    </script>
+</body>
+
+</html>

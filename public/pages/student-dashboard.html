@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Online Exam System</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="animate-fade-in">
+    <nav class="nav">
+        <h1>ExamPortal</h1>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div style="text-align: right;">
+                <p id="studentName" style="font-weight: 600; color: var(--text-main); line-height: 1;">Student</p>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Active Student</p>
+            </div>
+            <button class="btn btn-secondary" onclick="logout()" style="padding: 0.5rem 1rem;">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card"
+            style="margin-bottom: 3rem; background: linear-gradient(to right, #ffffff, #f1f5f9); border-left: 4px solid var(--primary);">
+            <h2 style="margin-bottom: 0.5rem;">Ready to take an exam?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Enter the unique 6-digit code provided by your
+                proctor to begin.</p>
+
+            <form id="startExamForm" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <input type="text" id="examCode" placeholder="Enter 6-digit exam code" required
+                        style="width: 100%; padding: 0.9rem 1.2rem; border-radius: 8px; border: 1.5px solid var(--border); font-size: 1rem; font-weight: 600; letter-spacing: 2px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="padding: 0.9rem 2rem;">Start Exam Now</button>
+            </form>
+            <p id="examError" style="color: #ef4444; margin-top: 1rem; font-size: 0.9rem; display: none;"></p>
+        </div>
+
+        <section style="margin-bottom: 3rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem;">Scheduled Exams</h2>
+                <span
+                    style="font-size: 0.85rem; color: var(--text-muted); background: var(--bg-main); padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid var(--border);">Upcoming</span>
+            </div>
+            <div id="availableExams" class="dashboard-grid">
+                <!-- Available exams will be loaded here -->
+            </div>
+        </section>
+
+        <section>
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem;">Performance Overview</h2>
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Exam Title</th>
+                                <th>Score</th>
+                                <th>Total Questions</th>
+                                <th>Completion Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pastResultsBody">
+                            <!-- Results will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="../js/student.js"></script>
+    <script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+        document.getElementById('studentName').innerText = localStorage.getItem('username') || 'Student';
+    </script>
+</body>
+
+</html>

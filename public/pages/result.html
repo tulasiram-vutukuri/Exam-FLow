@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result - Online Exam System</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div class="container" style="max-width: 500px; margin-top: 100px; text-align: center;">
+        <div class="card">
+            <h1 style="color: var(--primary-color);">Exam Result</h1>
+            <div style="margin: 2rem 0;">
+                <p style="font-size: 1.2rem;">Username: <strong id="resUsername"></strong></p>
+                <div style="font-size: 3rem; font-weight: bold; margin: 1rem 0;" id="resScore">0 / 0</div>
+                <p id="resStatus" style="font-weight: bold; font-size: 1.2rem;"></p>
+            </div>
+            <a href="student-dashboard.html" class="btn btn-primary" style="width: 100%;">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        const score = localStorage.getItem('lastScore');
+        const total = localStorage.getItem('lastTotal');
+        const username = localStorage.getItem('username');
+
+        document.getElementById('resUsername').innerText = username;
+        document.getElementById('resScore').innerText = `${score} / ${total}`;
+
+        const percentage = (score / total) * 100;
+        const statusEl = document.getElementById('resStatus');
+        if (percentage >= 40) {
+            statusEl.innerText = 'PASSED';
+            statusEl.style.color = '#10b981';
+        } else {
+            statusEl.innerText = 'FAILED';
+            statusEl.style.color = '#ef4444';
+        }
+    </script>
+</body>
+
+</html>
