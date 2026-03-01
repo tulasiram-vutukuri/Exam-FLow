@@ -1,9 +1,9 @@
-# ExamFlow
+# ExamFlow  
 Online Examination and Result Processing System
 
-This project is a full-stack web application that allows administrators to create, schedule, and manage exams, while enabling students to attend exams with a real-time countdown timer and automatic submission system.
+ExamFlow is a full-stack web application that allows administrators to create, schedule, manage, and delete exams, while enabling students to attend exams with a real-time countdown timer and automatic submission system.
 
-The application is designed with clear frontend-backend separation and focuses on secure scheduling, timed assessments, and structured result processing.
+The application follows a clear frontend-backend separation and focuses on secure scheduling, timed assessments, and structured result processing.
 
 ------------------------------------------------------------
 
@@ -11,7 +11,7 @@ Project Overview
 
 The goal of this project is to build a secure and practical online examination platform where:
 
-- Admins can create and schedule exams.
+- Admins can create, schedule, and delete exams.
 - Students can attempt exams only after the scheduled time.
 - A real-time countdown timer controls exam duration.
 - Exams are automatically submitted when time expires.
@@ -27,10 +27,11 @@ Admin Features
 
 - Secure admin authentication
 - Create new exams
-- Set scheduled date and time
+- Schedule exams with date and time
 - Set exam duration (in minutes)
-- View scheduled exams on dashboard
-- Manage exam workflow
+- Delete scheduled exams
+- View all scheduled exams on dashboard
+- Manage complete exam workflow
 
 Student Features
 
@@ -117,8 +118,8 @@ Installation and Setup
 
 1. Clone the repository
 
-git clone https://github.com/your-username/exam-portal.git
-cd exam-portal
+git clone https://github.com/tulasiram-vutukuri/Exam-FLow.git  
+cd Exam-FLow
 
 2. Install dependencies
 
@@ -128,15 +129,15 @@ npm install
 
 Create a .env file in the root directory and add:
 
-DB_HOST=your_host
-DB_USER=your_user
-DB_PASSWORD=your_password
-DB_NAME=your_database
-JWT_SECRET=your_secret
+DB_HOST=your_host  
+DB_USER=your_user  
+DB_PASSWORD=your_password  
+DB_NAME=your_database  
+JWT_SECRET=your_secret  
 
 4. Setup database
 
-Import the file:
+Import:
 
 database/schema.sql
 
@@ -154,12 +155,12 @@ http://localhost:3000
 
 Default Credentials (For Testing)
 
-Admin
-Username: admin@09
-Password: admin@22
+Admin  
+Username: admin@09  
+Password: admin@22  
 
-Student
-Username: VTUXXXXX
+Student  
+Username: VTUXXXXX  
 Password: VTUXXXXX (any 5-digit number)
 
 ------------------------------------------------------------
@@ -183,4 +184,4 @@ This project demonstrates:
 - Automatic result processing
 - Clean separation of frontend and backend logic
 
-It is designed to simulate a real-world online examination workflow and reflect practical backend control and timing logic.
+It simulates a real-world online examination workflow with proper backend control and time-based access enforcement.
