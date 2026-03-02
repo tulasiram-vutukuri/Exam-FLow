@@ -5,30 +5,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | ExamPortal</title>
+
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .left-panel h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .left-panel p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.6rem;
+            margin: 0 15px;
+            transition: 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            transform: scale(1.2);
+            opacity: 0.8;
+        }
+
+        /* RIGHT PANEL */
+        .right-panel {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+            background: var(--bg-main);
         }
 
+        /* REMOVE CARD BORDER FOR CLEAN LOOK */
         .login-card {
-            width: 100%;
-            max-width: 450px;
-            padding: 3rem;
-            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none !important;
+            box-shadow: none !important;
         }
 
-        .abstract-circle {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .left-panel {
+                height: 40vh;
+            }
+
+            .right-panel {
+                height: 60vh;
+            }
         }
     </style>
 </head>
@@ -38,45 +97,49 @@
 
     <div class="card login-card">
         <div style="text-align: center; margin-bottom: 2.5rem;">
-            <img src="https://upload.wikimedia.org/wikipedia/en/e/e9/Veltech_Rangarajan_Dr._Sagunthala_R%26D_Institute_of_Science_and_Technology_logo.png" alt="Logo" style="max-width: 150px; height: auto; margin-bottom: 1.5rem;" />
+            <img src="../images/logo.png" alt="Logo" style="max-width: 150px; height: auto; margin-bottom: 1.5rem;" />
             <h1 style="font-size: 1.75rem; font-weight: 700; letter-spacing: -0.025em; color: var(--text-main);">
                 ExamPortal</h1>
             <p style="color: var(--text-muted); font-weight: 500; margin-top: 0.5rem;">The next generation of
                 examinations.</p>
         </div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Institutional ID / Email</label>
-                <div style="position: relative;">
-                    <i class="far fa-user"
-                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                    <input type="text" id="username" placeholder="Enter your ID" style="padding-left: 2.75rem;"
-                        required>
-                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Institutional ID / Email</label>
+                        <div style="position: relative;">
+                            <i class="far fa-user"
+                                style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                            <input type="text" id="username" placeholder="Enter your ID"
+                                style="padding-left: 2.75rem;" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Security Password</label>
+                        <div style="position: relative;">
+                            <i class="fas fa-lock"
+                                style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                            <input type="password" id="password" placeholder="••••••••"
+                                style="padding-left: 2.75rem;" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; padding: 1rem; font-size: 1rem; margin-top: 1rem;">
+                        Sign In To Account
+                        <i class="fas fa-arrow-right" style="margin-left: 0.5rem;"></i>
+                    </button>
+                </form>
+
+                <p id="errorMsg"
+                    style="color: var(--accent); text-align: center; margin-top: 1.5rem; font-size: 0.85rem; font-weight: 600; display: none;">
+                </p>
+
             </div>
-            <div class="form-group">
-                <label for="password">Security Password</label>
-                <div style="position: relative;">
-                    <i class="fas fa-lock"
-                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                    <input type="password" id="password" placeholder="••••••••" style="padding-left: 2.75rem;" required>
-                </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary"
-                style="width: 100%; padding: 1rem; font-size: 1rem; margin-top: 1rem;">
-                Sign In To Account <i class="fas fa-arrow-right" style="margin-left: 0.5rem;"></i>
-            </button>
-        </form>
-
-        <p id="errorMsg"
-            style="color: var(--accent); text-align: center; margin-top: 1.5rem; font-size: 0.85rem; font-weight: 600; display: none;">
-        </p>
-
-        <div style="margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center;">
-            <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Authorized Personnel Only</p>
         </div>
+
     </div>
 
     <script src="../js/login.js"></script>
